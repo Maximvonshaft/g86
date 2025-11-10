@@ -1,0 +1,217 @@
+/**
+ * 设计令牌系统 (Design Tokens)
+ * 专业游戏工作室移动端UI适配标准
+ */
+
+:root {
+  /* ==================== 断点系统 (Breakpoints) ==================== */
+  --breakpoint-xs: 320px;   /* iPhone SE */
+  --breakpoint-sm: 375px;   /* iPhone 12/13 Mini */
+  --breakpoint-md: 414px;   /* iPhone 12/13 Pro */
+  --breakpoint-lg: 768px;   /* iPad Mini 横屏 */
+  --breakpoint-xl: 1024px;  /* iPad 横屏 */
+  --breakpoint-2xl: 1366px; /* 大屏平板 */
+
+  /* ==================== 安全区域 (Safe Area Insets) ==================== */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+
+  /* 额外缓冲区(防止误触边缘) */
+  --safe-margin-top: max(var(--safe-area-top), 12px);
+  --safe-margin-right: max(var(--safe-area-right), 12px);
+  --safe-margin-bottom: max(var(--safe-area-bottom), 16px);
+  --safe-margin-left: max(var(--safe-area-left), 12px);
+
+  /* ==================== 间距系统 (Spacing Scale) ==================== */
+  /* 基于8pt网格系统,使用clamp实现响应式 */
+  --space-1: clamp(0.25rem, 0.5vmin, 0.5rem);   /* 4-8px */
+  --space-2: clamp(0.5rem, 1vmin, 0.75rem);     /* 8-12px */
+  --space-3: clamp(0.75rem, 1.5vmin, 1rem);     /* 12-16px */
+  --space-4: clamp(1rem, 2vmin, 1.5rem);        /* 16-24px */
+  --space-5: clamp(1.25rem, 2.5vmin, 2rem);     /* 20-32px */
+  --space-6: clamp(1.5rem, 3vmin, 2.5rem);      /* 24-40px */
+  --space-8: clamp(2rem, 4vmin, 3rem);          /* 32-48px */
+
+  /* ==================== 字体系统 (Typography Scale) ==================== */
+  /* 使用clamp实现流式排版 */
+  --font-size-xs: clamp(0.625rem, 1.5vmin, 0.75rem);  /* 10-12px */
+  --font-size-sm: clamp(0.75rem, 1.8vmin, 0.875rem);  /* 12-14px */
+  --font-size-base: clamp(0.875rem, 2vmin, 1rem);     /* 14-16px */
+  --font-size-lg: clamp(1rem, 2.5vmin, 1.25rem);      /* 16-20px */
+  --font-size-xl: clamp(1.125rem, 3vmin, 1.5rem);     /* 18-24px */
+  --font-size-2xl: clamp(1.25rem, 3.5vmin, 1.75rem);  /* 20-28px */
+  --font-size-3xl: clamp(1.5rem, 4vmin, 2rem);        /* 24-32px */
+
+  /* ==================== 触摸区域系统 (Touch Targets) ==================== */
+  /* 符合WCAG 2.1 AA标准 */
+  --touch-target-min: 44px;        /* 最小触摸区域 */
+  --touch-target-comfortable: 56px; /* 舒适触摸区域 */
+  --touch-target-large: 72px;       /* 主要操作按钮 */
+  --touch-gap-min: 8px;             /* 最小按钮间距 */
+  --touch-gap-comfortable: 12px;    /* 舒适按钮间距 */
+
+  /* 响应式按钮尺寸 */
+  --button-size-primary: clamp(64px, 12vmin, 88px);
+  --button-size-secondary: clamp(52px, 10vmin, 72px);
+  --button-size-tertiary: clamp(44px, 8vmin, 60px);
+
+  /* 虚拟摇杆尺寸 */
+  --joystick-size: clamp(80px, 15vmin, 128px);
+  --joystick-thumb-size: clamp(40px, 7vmin, 64px);
+
+  /* ==================== 颜色系统 (Color Palette) ==================== */
+  /* L4D2军用高对比度配色 */
+  --color-background: #0A0A0A;
+  --color-background-alpha: rgba(10, 10, 10, 0.85);
+  
+  /* 状态色 - 安全/正常 */
+  --color-safe: #39FF14;              /* 霓虹绿 */
+  --color-safe-glow: rgba(57, 255, 20, 0.55);
+  --color-safe-border: rgba(82, 255, 120, 0.55);
+  
+  /* 状态色 - 警告 */
+  --color-warning: #FFB700;           /* 琥珀黄 */
+  --color-warning-glow: rgba(255, 183, 0, 0.55);
+  --color-warning-border: rgba(255, 183, 0, 0.65);
+  
+  /* 状态色 - 危险 */
+  --color-danger: #FF073A;            /* 鲜红 */
+  --color-danger-glow: rgba(255, 7, 58, 0.55);
+  --color-danger-border: rgba(255, 7, 58, 0.65);
+  
+  /* 信息色 */
+  --color-info: #93C5FD;              /* 蓝色 */
+  --color-info-glow: rgba(147, 197, 253, 0.55);
+  --color-info-border: rgba(102, 166, 255, 0.65);
+  
+  /* 文本色 */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: rgba(255, 255, 255, 0.85);
+  --color-text-tertiary: rgba(255, 255, 255, 0.65);
+
+  /* ==================== Z-Index层级系统 ==================== */
+  --z-game-canvas: 1;
+  --z-hud-background: 100;
+  --z-hud-info: 200;
+  --z-hud-controls: 300;
+  --z-hud-context: 400;
+  --z-hud-modal: 500;
+  --z-hud-toast: 600;
+  --z-debug: 9999;
+
+  /* ==================== 动画系统 (Animation) ==================== */
+  --transition-fast: 80ms;
+  --transition-base: 160ms;
+  --transition-slow: 300ms;
+  
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ==================== 阴影系统 (Shadows) ==================== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-base: 0 2px 4px 0 rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 8px 0 rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 8px 16px 0 rgba(0, 0, 0, 0.8);
+  
+  /* 发光效果 */
+  --glow-safe: 0 0 12px var(--color-safe-glow);
+  --glow-warning: 0 0 12px var(--color-warning-glow);
+  --glow-danger: 0 0 12px var(--color-danger-glow);
+  --glow-info: 0 0 12px var(--color-info-glow);
+
+  /* ==================== 边框系统 (Borders) ==================== */
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+  
+  --border-radius-sm: 4px;
+  --border-radius-base: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-full: 9999px;
+
+  /* ==================== 模糊效果 (Backdrop Filter) ==================== */
+  --backdrop-blur-sm: blur(4px);
+  --backdrop-blur-base: blur(8px);
+  --backdrop-blur-lg: blur(12px);
+}
+
+/* ==================== 小屏手机优化 (iPhone SE等) ==================== */
+@media (max-width: 374px) {
+  :root {
+    --space-base: 0.75rem;
+    --font-scale: 0.9;
+    
+    /* 缩小按钮尺寸 */
+    --button-size-primary: clamp(56px, 12vmin, 72px);
+    --button-size-secondary: clamp(44px, 10vmin, 60px);
+    --joystick-size: clamp(72px, 15vmin, 100px);
+  }
+}
+
+/* ==================== 标准手机 (iPhone 12/13等) ==================== */
+@media (min-width: 375px) and (max-width: 767px) {
+  :root {
+    --space-base: 1rem;
+    --font-scale: 1;
+  }
+}
+
+/* ==================== 大屏手机/小平板 ==================== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --space-base: 1.25rem;
+    --font-scale: 1.1;
+    
+    /* 增大触摸区域 */
+    --button-size-primary: clamp(72px, 12vmin, 96px);
+    --button-size-secondary: clamp(60px, 10vmin, 80px);
+  }
+}
+
+/* ==================== 平板横屏 ==================== */
+@media (min-width: 1024px) {
+  :root {
+    --space-base: 1.5rem;
+    --font-scale: 1.2;
+    
+    /* 更大的触摸区域 */
+    --button-size-primary: clamp(80px, 12vmin, 104px);
+    --button-size-secondary: clamp(68px, 10vmin, 88px);
+  }
+}
+
+/* ==================== 超宽屏优化 (20:9+) ==================== */
+@media (min-aspect-ratio: 20/9) {
+  :root {
+    --safe-margin-left: max(var(--safe-area-left), calc(5vw + 12px));
+    --safe-margin-right: max(var(--safe-area-right), calc(5vw + 12px));
+  }
+}
+
+/* ==================== 高刷新率屏幕优化 ==================== */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --transition-fast: 60ms;
+    --transition-base: 120ms;
+  }
+}
+
+/* ==================== 低性能/无障碍模式 ==================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0.01ms;
+    --transition-base: 0.01ms;
+    --transition-slow: 0.01ms;
+  }
+}
+
+/* ==================== 暗黑模式优化 (默认) ==================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0A0A0A;
+  }
+}
