@@ -1,19 +1,41 @@
+/**
+ * 游戏HUD样式 - 移动端优化版
+ * 符合专业游戏工作室开发标准
+ */
+
+/* ==================== 根容器 ==================== */
 .hud-root {
   position: absolute;
   inset: 0;
   pointer-events: none;
   font-family: 'Digital-7', 'Orbitron', 'Inter', sans-serif;
-  color: #39ff14;
+  color: var(--color-safe);
   text-transform: uppercase;
-  text-shadow: 0 0 6px rgba(57, 255, 20, 0.55);
+  text-shadow: 0 0 6px var(--color-safe-glow);
+  
+  /* 性能优化 */
+  isolation: isolate;
+  will-change: contents;
+  
+  /* 安全区域适配 */
+  padding-top: var(--safe-margin-top);
+  padding-right: var(--safe-margin-right);
+  padding-bottom: var(--safe-margin-bottom);
+  padding-left: var(--safe-margin-left);
 }
 
+/* ==================== 层级系统 ==================== */
 .hud-layer {
   position: absolute;
-  z-index: 200;
+  z-index: var(--z-hud-info);
   pointer-events: none;
+  
+  /* 性能优化 */
+  contain: layout style paint;
+  will-change: transform;
 }
 
+/* ==================== 顶部层 (玩家状态 + 阶段信息) ==================== */
 .hud-layer--top {
   top: 0;
   left: 0;
@@ -21,206 +43,285 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px 32px;
-  gap: 24px;
+  padding: var(--space-4);
+  gap: var(--space-4);
 }
 
+/* ==================== 左下层 (虚拟摇杆 + 队友) ==================== */
 .hud-layer--left {
-  bottom: 32px;
-  left: 32px;
+  bottom: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-width: 260px;
+  gap: var(--space-3);
+  max-width: min(280px, 35vw);
 }
 
+/* ==================== 右下层 (战斗簇) ==================== */
 .hud-layer--right {
-  bottom: 32px;
-  right: 32px;
+  bottom: 0;
+  right: 0;
+  z-index: var(--z-hud-controls);
 }
 
+/* ==================== 右上层 (战略物品) ==================== */
 .hud-layer--top-right {
-  top: 32px;
-  right: 32px;
+  top: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-3);
+  z-index: var(--z-hud-controls);
 }
 
+/* ==================== 中央层 (弹药显示) ==================== */
 .hud-layer--center {
-  bottom: 32px;
+  bottom: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateZ(0);
+  /* GPU加速 */
+  will-change: transform;
 }
 
+/* ==================== 玩家状态 ==================== */
 .hud-player-status {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 220px;
+  gap: var(--space-2);
+  min-width: clamp(180px, 25vw, 260px);
 }
 
 .hud-player-faction {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   letter-spacing: 0.08em;
   opacity: 0.8;
 }
 
+/* ==================== 血量条 ==================== */
 .hud-health-bar {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .hud-health-bar__label {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   letter-spacing: 0.08em;
 }
 
 .hud-health-bar__value {
-  color: #ffffff;
+  color: var(--color-text-primary);
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.65);
 }
 
 .hud-health-bar__track {
   position: relative;
-  height: 14px;
-  border: 2px solid rgba(82, 255, 120, 0.55);
-  background: rgba(12, 18, 28, 0.85);
+  height: clamp(12px, 2vmin, 16px);
+  border: var(--border-width-base) solid var(--color-safe-border);
+  background: var(--color-background-alpha);
   overflow: hidden;
+  border-radius: var(--border-radius-sm);
+  
+  /* 性能优化 */
+  contain: strict;
 }
 
 .hud-health-bar__fill {
   height: 100%;
   background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), rgba(57, 255, 170, 0.9));
-  box-shadow: 0 0 12px rgba(57, 255, 128, 0.55);
-  transition: width 160ms ease-out;
+  box-shadow: var(--glow-safe);
+  
+  /* 使用transform而非width动画 */
+  transform: scaleX(var(--health-percent, 1)) translateZ(0);
+  transform-origin: left center;
+  transition: transform var(--transition-base) var(--easing-out);
+  
+  /* GPU加速 */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .hud-health-bar.warning .hud-health-bar__fill {
   background: linear-gradient(90deg, rgba(255, 183, 0, 0.95), rgba(255, 230, 102, 0.9));
-  box-shadow: 0 0 12px rgba(255, 183, 0, 0.55);
+  box-shadow: var(--glow-warning);
 }
 
 .hud-health-bar.danger .hud-health-bar__fill {
   background: linear-gradient(90deg, rgba(255, 7, 58, 0.95), rgba(255, 102, 123, 0.9));
-  box-shadow: 0 0 12px rgba(255, 7, 58, 0.55);
+  box-shadow: var(--glow-danger);
+  animation: pulse-danger 1s infinite alternate;
 }
 
+@keyframes pulse-danger {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.3); }
+}
+
+/* ==================== 阶段信息 ==================== */
 .hud-stage-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 18px;
-  border: 2px solid rgba(102, 166, 255, 0.65);
-  background: rgba(10, 10, 10, 0.65);
-  backdrop-filter: blur(4px);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-base) solid var(--color-info-border);
+  background: var(--color-background-alpha);
+  backdrop-filter: var(--backdrop-blur-sm);
   letter-spacing: 0.08em;
+  border-radius: var(--border-radius-base);
 }
 
 .hud-stage-info__name {
-  font-size: 14px;
-  color: #93c5fd;
+  font-size: var(--font-size-sm);
+  color: var(--color-info);
 }
 
 .hud-stage-info__timer {
-  font-size: 20px;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(147, 197, 253, 0.75);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  text-shadow: 0 0 8px var(--color-info-glow);
 }
 
+/* ==================== 智能消息 ==================== */
 .hud-smart-messages {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
+  max-width: min(400px, 50vw);
 }
 
 .hud-smart-messages__item {
-  padding: 6px 10px;
-  border-left: 3px solid #ffb700;
-  background: rgba(24, 19, 3, 0.65);
-  color: #ffb700;
+  padding: var(--space-2) var(--space-3);
+  border-left: var(--border-width-thick) solid var(--color-warning);
+  background: rgba(24, 19, 3, 0.85);
+  color: var(--color-warning);
   letter-spacing: 0.08em;
+  font-size: var(--font-size-sm);
+  border-radius: var(--border-radius-sm);
+  
+  /* 动画 */
+  animation: slideDown 300ms var(--easing-out);
+  
+  /* 性能优化 */
+  will-change: transform, opacity;
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+/* ==================== 虚拟摇杆 ==================== */
 .hud-joystick-ghost {
-  width: 128px;
-  height: 128px;
-  border: 2px dashed rgba(57, 255, 20, 0.25);
+  width: var(--joystick-size);
+  height: var(--joystick-size);
+  border: var(--border-width-base) dashed rgba(57, 255, 20, 0.25);
   border-radius: 50%;
   position: relative;
   background: radial-gradient(rgba(57, 255, 20, 0.15), rgba(10, 15, 20, 0.05));
+  
+  /* 性能优化 */
+  contain: strict;
+  will-change: transform;
 }
 
 .hud-joystick-ghost__inner {
   position: absolute;
-  inset: 20px;
+  inset: var(--space-4);
   border-radius: 50%;
-  border: 2px solid rgba(57, 255, 20, 0.35);
+  border: var(--border-width-base) solid rgba(57, 255, 20, 0.35);
 }
 
+/* ==================== 队友状态列表 ==================== */
 .hud-teammates {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 260px;
+  gap: var(--space-2);
+  max-height: clamp(200px, 30vh, 300px);
   overflow: hidden;
 }
 
 .hud-teammate {
   display: flex;
-  gap: 10px;
-  padding: 8px 10px;
-  background: rgba(10, 15, 20, 0.65);
-  border: 2px solid rgba(57, 255, 20, 0.25);
-  backdrop-filter: blur(3px);
-  max-width: 220px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-background-alpha);
+  border: var(--border-width-base) solid rgba(57, 255, 20, 0.25);
+  backdrop-filter: var(--backdrop-blur-sm);
+  max-width: 100%;
+  border-radius: var(--border-radius-base);
+  
+  /* 性能优化 */
+  contain: layout style paint;
 }
 
 .hud-teammate__avatar {
-  width: 32px;
-  height: 32px;
+  width: clamp(28px, 5vmin, 36px);
+  height: clamp(28px, 5vmin, 36px);
+  flex-shrink: 0;
   background: rgba(57, 255, 20, 0.35);
-  border: 2px solid rgba(57, 255, 20, 0.5);
+  border: var(--border-width-base) solid rgba(57, 255, 20, 0.5);
+  border-radius: var(--border-radius-sm);
 }
 
 .hud-teammate__info {
   flex: 1;
+  min-width: 0;
 }
 
 .hud-teammate__name {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   letter-spacing: 0.08em;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hud-teammate__health-track {
-  height: 6px;
+  height: clamp(4px, 1vmin, 6px);
   background: rgba(12, 18, 28, 0.8);
-  border: 1px solid rgba(57, 255, 20, 0.35);
+  border: var(--border-width-thin) solid rgba(57, 255, 20, 0.35);
   overflow: hidden;
+  border-radius: var(--border-radius-full);
+  
+  /* 性能优化 */
+  contain: strict;
 }
 
 .hud-teammate__health-fill {
   height: 100%;
   background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), rgba(102, 255, 178, 0.9));
-  transition: width 160ms ease-out;
+  
+  /* 使用transform动画 */
+  transform: scaleX(var(--teammate-health-percent, 1)) translateZ(0);
+  transform-origin: left center;
+  transition: transform var(--transition-base) var(--easing-out);
+  
+  /* GPU加速 */
+  will-change: transform;
 }
 
 .hud-teammate__hint {
-  margin-top: 4px;
-  font-size: 11px;
-  color: #ffb700;
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-warning);
 }
 
+/* 队友状态变体 */
 .hud-teammate--wounded {
-  border-color: rgba(255, 183, 0, 0.55);
+  border-color: var(--color-warning-border);
 }
 
 .hud-teammate--incapacitated {
-  border-color: rgba(255, 7, 58, 0.65);
+  border-color: var(--color-danger-border);
   animation: hud-alert 1s infinite alternate;
 }
 
@@ -230,133 +331,183 @@
 }
 
 .hud-teammate--highlight {
-  box-shadow: 0 0 16px rgba(255, 183, 0, 0.35);
+  box-shadow: 0 0 16px var(--color-warning-glow);
 }
 
 @keyframes hud-alert {
-  from {
-    filter: brightness(1);
-  }
-  to {
-    filter: brightness(1.35);
-  }
+  from { filter: brightness(1); }
+  to { filter: brightness(1.35); }
 }
 
+/* ==================== 战斗按钮簇 ==================== */
 .hud-combat {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--touch-gap-comfortable);
   pointer-events: auto;
 }
 
 .hud-button {
   position: relative;
-  min-width: 120px;
-  padding: 18px 22px;
-  font-size: 16px;
+  min-width: var(--button-size-secondary);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
   letter-spacing: 0.12em;
-  border: 2px solid rgba(57, 255, 20, 0.75);
-  background: rgba(8, 12, 18, 0.82);
-  color: #39ff14;
+  border: var(--border-width-base) solid var(--color-safe-border);
+  background: var(--color-background-alpha);
+  color: var(--color-safe);
   cursor: pointer;
-  transition: transform 80ms ease, box-shadow 120ms ease;
+  border-radius: var(--border-radius-base);
+  
+  /* 移除触摸延迟 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  
+  /* 动画 */
+  transition: 
+    transform var(--transition-fast) var(--easing-out),
+    box-shadow var(--transition-base) var(--easing-out);
+  
+  /* 性能优化 */
   pointer-events: auto;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .hud-button:active {
-  transform: scale(0.96);
-  box-shadow: 0 0 18px rgba(57, 255, 20, 0.45);
+  transform: scale(0.96) translateZ(0);
+  box-shadow: 0 0 18px var(--color-safe-glow);
 }
 
 .hud-button.disabled,
 .hud-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .hud-button--primary {
-  min-width: 148px;
-  font-size: 18px;
+  min-width: var(--button-size-primary);
+  min-height: var(--touch-target-comfortable);
+  font-size: var(--font-size-lg);
   background: rgba(12, 20, 32, 0.82);
   border-color: rgba(57, 255, 140, 0.85);
-  box-shadow: 0 0 14px rgba(57, 255, 140, 0.32);
+  box-shadow: var(--glow-safe);
 }
 
 .hud-button--secondary {
-  font-size: 14px;
-  border-color: rgba(147, 197, 253, 0.65);
-  color: #93c5fd;
-  box-shadow: 0 0 12px rgba(147, 197, 253, 0.25);
+  font-size: var(--font-size-sm);
+  border-color: var(--color-info-border);
+  color: var(--color-info);
+  box-shadow: var(--glow-info);
+}
+
+.hud-button__label {
+  display: block;
+  pointer-events: none;
 }
 
 .hud-button__badge {
   display: inline-block;
-  margin-top: 6px;
-  padding: 2px 6px;
-  font-size: 12px;
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
   color: #0b0f16;
-  background: #ffb700;
+  background: var(--color-warning);
+  border-radius: var(--border-radius-sm);
 }
 
 .hud-button__progress-ring {
   position: absolute;
   inset: 6px;
-  border-radius: 12px;
-  background:
-    conic-gradient(
-      rgba(147, 197, 253, 0.85) calc(var(--progress) * 360deg),
-      rgba(12, 20, 32, 0.35) 0deg
-    );
+  border-radius: var(--border-radius-base);
+  background: conic-gradient(
+    rgba(147, 197, 253, 0.85) calc(var(--progress, 0) * 360deg),
+    rgba(12, 20, 32, 0.35) 0deg
+  );
   opacity: 0.55;
   pointer-events: none;
+  
+  /* GPU加速 */
+  will-change: background;
+  transform: translateZ(0);
 }
 
 .hud-button.is-reloading {
   border-color: rgba(147, 197, 253, 0.85);
 }
 
+/* ==================== 战略物品簇 ==================== */
 .hud-strategic {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   pointer-events: auto;
 }
 
 .hud-strategic__swap {
-  padding: 12px 16px;
-  background: rgba(8, 12, 18, 0.75);
-  border: 2px solid rgba(102, 166, 255, 0.65);
-  color: #93c5fd;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-background-alpha);
+  border: var(--border-width-base) solid var(--color-info-border);
+  color: var(--color-info);
   letter-spacing: 0.1em;
   cursor: pointer;
-  transition: transform 90ms ease, box-shadow 140ms ease;
+  font-size: var(--font-size-sm);
+  border-radius: var(--border-radius-base);
+  
+  /* 触摸优化 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  min-height: var(--touch-target-min);
+  
+  /* 动画 */
+  transition: 
+    transform var(--transition-fast) var(--easing-out),
+    box-shadow var(--transition-base) var(--easing-out);
+  
+  /* 性能优化 */
   pointer-events: auto;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .hud-strategic__swap:active {
-  transform: scale(0.97);
-  box-shadow: 0 0 12px rgba(102, 166, 255, 0.45);
+  transform: scale(0.97) translateZ(0);
+  box-shadow: var(--glow-info);
+}
+
+.hud-strategic__label {
+  display: block;
 }
 
 .hud-strategic__value {
   display: block;
-  margin-top: 6px;
-  font-size: 12px;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
   color: rgba(147, 197, 253, 0.85);
 }
 
 .hud-strategic__slots {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .hud-slot {
-  padding: 10px 14px;
-  border: 2px solid rgba(57, 255, 20, 0.35);
-  background: rgba(8, 12, 18, 0.7);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-base) solid rgba(57, 255, 20, 0.35);
+  background: var(--color-background-alpha);
   letter-spacing: 0.08em;
-  transition: box-shadow 140ms ease, border-color 140ms ease;
+  border-radius: var(--border-radius-base);
+  
+  /* 动画 */
+  transition: 
+    box-shadow var(--transition-base) var(--easing-out),
+    border-color var(--transition-base) var(--easing-out);
 }
 
 .hud-slot-button {
@@ -364,32 +515,46 @@
   text-align: left;
   cursor: pointer;
   pointer-events: auto;
-  transition: transform 90ms ease;
+  min-height: var(--touch-target-min);
+  
+  /* 触摸优化 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  
+  /* 动画 */
+  transition: transform var(--transition-fast) var(--easing-out);
+  
+  /* 性能优化 */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .hud-slot-button:active {
-  transform: scale(0.97);
+  transform: scale(0.97) translateZ(0);
 }
 
 .hud-slot-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .hud-slot__label {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   opacity: 0.75;
+  display: block;
 }
 
 .hud-slot__value {
   display: block;
-  margin-top: 6px;
-  font-size: 14px;
-  color: #ffffff;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
 }
 
 .hud-slot--active {
-  box-shadow: 0 0 16px rgba(255, 183, 0, 0.35);
+  box-shadow: 0 0 16px var(--color-warning-glow);
 }
 
 .hud-slot--heal.hud-slot--active {
@@ -398,8 +563,8 @@
 }
 
 .hud-slot--throwable.hud-slot--active {
-  border-color: rgba(255, 183, 0, 0.85);
-  box-shadow: 0 0 18px rgba(255, 183, 0, 0.38);
+  border-color: var(--color-warning-border);
+  box-shadow: 0 0 18px var(--color-warning-glow);
 }
 
 .hud-slot--heal {
@@ -410,107 +575,185 @@
   border-color: rgba(255, 183, 0, 0.55);
 }
 
+/* ==================== 弹药显示 ==================== */
 .hud-ammo {
-  min-width: 220px;
-  padding: 12px 18px;
-  border: 2px solid rgba(57, 255, 20, 0.35);
-  background: rgba(8, 12, 18, 0.75);
+  min-width: clamp(180px, 25vw, 240px);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-base) solid rgba(57, 255, 20, 0.35);
+  background: var(--color-background-alpha);
   text-align: center;
   letter-spacing: 0.08em;
+  border-radius: var(--border-radius-base);
+  backdrop-filter: var(--backdrop-blur-sm);
 }
 
 .hud-ammo__name {
-  font-size: 14px;
-  margin-bottom: 6px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
 }
 
 .hud-ammo__count {
-  font-size: 20px;
-  margin-bottom: 8px;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-2);
+  color: var(--color-text-primary);
+  text-shadow: 0 0 8px var(--color-safe-glow);
 }
 
 .hud-ammo__divider {
-  margin: 0 4px;
+  margin: 0 var(--space-1);
   opacity: 0.7;
 }
 
 .hud-ammo__track {
   position: relative;
-  height: 6px;
+  height: clamp(4px, 1vmin, 6px);
   background: rgba(12, 18, 28, 0.85);
-  border: 1px solid rgba(57, 255, 20, 0.35);
+  border: var(--border-width-thin) solid rgba(57, 255, 20, 0.35);
+  border-radius: var(--border-radius-full);
+  overflow: hidden;
+  
+  /* 性能优化 */
+  contain: strict;
 }
 
 .hud-ammo__fill {
   height: 100%;
   background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), rgba(102, 255, 178, 0.9));
-  transition: width 160ms ease-out;
+  
+  /* 使用transform动画 */
+  transform: scaleX(var(--ammo-percent, 1)) translateZ(0);
+  transform-origin: left center;
+  transition: transform var(--transition-base) var(--easing-out);
+  
+  /* GPU加速 */
+  will-change: transform;
 }
 
+/* ==================== 情境交互 ==================== */
 .hud-context {
   position: absolute;
-  right: 32px;
+  right: 0;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateZ(0);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-2);
   pointer-events: auto;
+  z-index: var(--z-hud-context);
+  
+  /* 动画 */
+  animation: fadeIn 300ms var(--easing-out);
+  
+  /* 性能优化 */
+  will-change: transform, opacity;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.9) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) translateZ(0);
+  }
 }
 
 .hud-context__button {
-  padding: 16px 22px;
-  border: 2px solid rgba(255, 183, 0, 0.75);
-  background: rgba(32, 24, 4, 0.72);
-  color: #ffb700;
+  padding: var(--space-4) var(--space-5);
+  border: var(--border-width-base) solid var(--color-warning-border);
+  background: rgba(32, 24, 4, 0.85);
+  color: var(--color-warning);
   letter-spacing: 0.1em;
   position: relative;
   cursor: pointer;
+  border-radius: var(--border-radius-base);
+  min-height: var(--touch-target-comfortable);
+  
+  /* 触摸优化 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  
+  /* 动画 */
+  transition: transform var(--transition-fast) var(--easing-out);
+  
+  /* 性能优化 */
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.hud-context__button:active {
+  transform: scale(0.96) translateZ(0);
 }
 
 .hud-context__label {
-  font-size: 16px;
+  font-size: var(--font-size-base);
+  display: block;
 }
 
 .hud-context__description {
   display: block;
-  margin-top: 6px;
-  font-size: 12px;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
   color: rgba(255, 231, 158, 0.92);
 }
 
 .hud-context__progress {
   position: absolute;
   inset: 6px;
-  border: 2px solid rgba(255, 183, 0, 0.65);
-  border-radius: 12px;
-  background:
-    conic-gradient(
-      rgba(255, 183, 0, 0.85) calc(var(--progress) * 360deg),
-      rgba(32, 24, 4, 0.35) 0deg
-    );
+  border: var(--border-width-base) solid var(--color-warning-border);
+  border-radius: var(--border-radius-base);
+  background: conic-gradient(
+    rgba(255, 183, 0, 0.85) calc(var(--progress, 0) * 360deg),
+    rgba(32, 24, 4, 0.35) 0deg
+  );
   opacity: 0.55;
   pointer-events: none;
+  
+  /* GPU加速 */
+  will-change: background;
+  transform: translateZ(0);
 }
 
 .hud-context__hint {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   color: rgba(255, 231, 158, 0.9);
   letter-spacing: 0.08em;
+  padding: var(--space-2);
+  background: rgba(32, 24, 4, 0.6);
+  border-radius: var(--border-radius-sm);
 }
 
-@media (max-width: 1320px) {
-  .hud-layer--top {
-    padding: 18px 20px;
-  }
+/* ==================== 响应式优化 ==================== */
 
-  .hud-layer--left,
-  .hud-layer--right,
-  .hud-layer--top-right {
-    left: 24px;
-    right: 24px;
+/* 小屏设备 - 紧凑布局 */
+@media (max-width: 374px) {
+  .hud-layer--top {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+  
+  .hud-player-status {
+    min-width: 160px;
+  }
+  
+  .hud-smart-messages {
+    max-width: 40vw;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大所有可点击元素的触摸区域 */
+  .hud-button::before,
+  .hud-slot-button::before,
+  .hud-strategic__swap::before,
+  .hud-context__button::before {
+    content: '';
+    position: absolute;
+    inset: calc(var(--touch-gap-min) * -1);
+    /* 扩大触摸区域但不影响视觉 */
   }
 }

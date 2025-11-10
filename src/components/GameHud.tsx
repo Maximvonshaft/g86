@@ -52,7 +52,10 @@ const HealthBar = ({ label, value, max, showValue = true }: HealthBarProps) => {
       <div className="hud-health-bar__track">
         <div
           className="hud-health-bar__fill"
-          style={{ width: `${percent * 100}%` }}
+          style={{ 
+            '--health-percent': percent,
+            width: `${percent * 100}%`
+          } as React.CSSProperties}
         />
       </div>
     </div>
@@ -76,7 +79,10 @@ const AmmoReadout = () => {
       <div className="hud-ammo__track">
         <div
           className="hud-ammo__fill"
-          style={{ width: `${percent * 100}%` }}
+          style={{ 
+            '--ammo-percent': percent,
+            width: `${percent * 100}%`
+          } as React.CSSProperties}
         />
       </div>
     </div>
@@ -105,7 +111,10 @@ const TeammateStatusList = () => {
               <div className="hud-teammate__health-track">
                 <div
                   className="hud-teammate__health-fill"
-                  style={{ width: `${percent * 100}%` }}
+                  style={{ 
+                    '--teammate-health-percent': percent,
+                    width: `${percent * 100}%`
+                  } as React.CSSProperties}
                 />
               </div>
               {teammate.specialHint && (
@@ -158,7 +167,7 @@ const CombatCluster = ({ onAction }: CombatClusterProps) => {
       </button>
       <button className="hud-button hud-button--secondary" onClick={() => onAction('shove')}>
         <span className="hud-button__label">推击</span>
-        <div className="hud-button__progress-ring" style={{ ['--progress' as string]: shovePercent }} />
+        <div className="hud-button__progress-ring" style={{ '--progress': shovePercent } as React.CSSProperties} />
       </button>
       <button
         className={`hud-button hud-button--secondary ${combat.isReloading ? 'is-reloading' : ''}`}
@@ -168,7 +177,7 @@ const CombatCluster = ({ onAction }: CombatClusterProps) => {
         {combat.isReloading && (
           <div
             className="hud-button__progress-ring"
-            style={{ ['--progress' as string]: reloadPercent }}
+            style={{ '--progress': reloadPercent } as React.CSSProperties}
           />
         )}
       </button>
@@ -247,7 +256,7 @@ const ContextActionPanel = () => {
         {contextAction.showProgressRing && (
           <div
             className="hud-context__progress"
-            style={{ ['--progress' as string]: percent }}
+            style={{ '--progress': percent } as React.CSSProperties}
           />
         )}
       </button>
