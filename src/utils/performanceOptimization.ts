@@ -250,7 +250,14 @@ export async function lockOrientationLandscape(): Promise<boolean> {
   }
   
   try {
-    await screen.orientation.lock('landscape')
+    const orientation = screen.orientation as ScreenOrientation & {
+      lock?: (orientation: 'landscape' | 'landscape-primary' | 'landscape-secondary') => Promise<void>
+    }
+    if (typeof orientation.lock !== 'function') {
+      return false
+    }
+
+    await orientation.lock('landscape')
     return true
   } catch (error) {
     console.warn('无法锁定屏幕方向:', error)

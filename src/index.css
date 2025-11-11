@@ -9,13 +9,9 @@
   -moz-osx-font-smoothing: grayscale;
   color: #e2e8f0;
   background-color: #0f172a;
-  
-  /* 禁止文本选择和长按菜单 */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
-  
-  /* 优化滚动性能 */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -31,28 +27,57 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  
-  /* 移动端优化 */
+  background-color: #0f172a;
+  color: inherit;
+}
+
+body {
   position: fixed;
+  inset: 0;
+  display: block;
+  overflow: hidden;
   overscroll-behavior: none;
-  touch-action: pan-x pan-y;
-  
-  /* 防止双击缩放 */
+  touch-action: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
 #root {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.app-root,
+.app-main,
+.phaser-shell,
+.phaser-container {
+  width: 100%;
+  height: 100%;
+}
+
+.phaser-shell {
   position: relative;
-  
-  /* 支持安全区域 */
-  padding-top: env(safe-area-inset-top);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phaser-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 a {

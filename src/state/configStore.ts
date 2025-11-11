@@ -13,18 +13,11 @@ export interface GraphicsSettings {
   targetFps: 60 | 90 | 120
 }
 
-export interface UiPreferences {
-  showHeader: boolean
-  showHud: boolean
-}
-
 interface ConfigState {
   controls: ControlPreferences
   graphics: GraphicsSettings
-  ui: UiPreferences
   updateControls: (controls: Partial<ControlPreferences>) => void
   updateGraphics: (graphics: Partial<GraphicsSettings>) => void
-  updateUi: (ui: Partial<UiPreferences>) => void
 }
 
 export const useConfigStore = create<ConfigState>((set) => ({
@@ -39,15 +32,9 @@ export const useConfigStore = create<ConfigState>((set) => ({
     renderScale: 1,
     targetFps: 60,
   },
-  ui: {
-    showHeader: true,
-    showHud: true,
-  },
   updateControls: (controls) =>
     set((state) => ({ controls: { ...state.controls, ...controls } })),
   updateGraphics: (graphics) =>
     set((state) => ({ graphics: { ...state.graphics, ...graphics } })),
-  updateUi: (ui) =>
-    set((state) => ({ ui: { ...state.ui, ...ui } })),
 }))
 

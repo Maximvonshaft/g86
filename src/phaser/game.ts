@@ -5,24 +5,39 @@ import { BootScene } from './scenes/BootScene'
 import { GameScene } from './scenes/GameScene'
 import { MenuScene } from './scenes/MenuScene'
 import { PreloadScene } from './scenes/PreloadScene'
+import {
+  DESIGN_HEIGHT,
+  DESIGN_WIDTH,
+  MAX_HEIGHT,
+  MAX_WIDTH,
+  MIN_HEIGHT,
+  MIN_WIDTH,
+  buildViewportState,
+  calculateSafeArea,
+  getCssSafeAreaInsets,
+  getVisualViewportInsets,
+  mergeDeviceSafeArea,
+} from './utils/viewportMetrics'
 
 let cachedGame: Phaser.Game | null = null
 
-const initialWidth =
-  typeof window !== 'undefined' && window.innerWidth > 0
-    ? window.innerWidth
-    : 1920
-const initialHeight =
-  typeof window !== 'undefined' && window.innerHeight > 0
-    ? window.innerHeight
-    : 1080
+const syncViewport = (game: Phaser.Game) => {
+  const visualInsets = getVisualViewportInsets()
+  const cssInsets = getCssSafeAreaInsets()
+  const deviceInsets = mergeDeviceSafeArea(visualInsets, cssInsets)
+  const metrics = calculateSafeArea(game.scale, deviceInsets)
+  gameStore.setViewport({
+    ...buildViewportState(metrics),
+    deviceSafeAreaPx: deviceInsets,
+  })
+}
 
 const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameConfig => ({
   type: Phaser.AUTO,
   parent,
   backgroundColor: '#111827',
-  width: initialWidth,
-  height: initialHeight,
+  width: DESIGN_WIDTH,
+  height: DESIGN_HEIGHT,
   pixelArt: false,
   antialias: true,
   powerPreference: 'high-performance',
@@ -35,15 +50,40 @@ const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameConfig => 
     },
   },
   scale: {
-    mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    expandParent: true,
     parent,
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    expandParent: false,
+    width: DESIGN_WIDTH,
+    height: DESIGN_HEIGHT,
+    min: {
+      width: MIN_WIDTH,
+      height: MIN_HEIGHT,
+    },
+    max: {
+      width: MAX_WIDTH,
+      height: MAX_HEIGHT,
+    },
   },
   callbacks: {
     postBoot: (game) => {
-      const { width, height } = game.scale.gameSize
-      gameStore.setViewport({ width, height })
+      const handleResize = () => syncViewport(game)
+      const handleVisualViewport = () => syncViewport(game)
+      syncViewport(game)
+      game.scale.on(Phaser.Scale.Events.RESIZE, handleResize)
+      const visualViewport =
+        typeof window !== 'undefined' ? window.visualViewport : undefined
+      if (visualViewport) {
+        visualViewport.addEventListener('resize', handleVisualViewport)
+        visualViewport.addEventListener('scroll', handleVisualViewport)
+      }
+      game.events.on(Phaser.Core.Events.DESTROY, () => {
+        game.scale.off(Phaser.Scale.Events.RESIZE, handleResize)
+        if (visualViewport) {
+          visualViewport.removeEventListener('resize', handleVisualViewport)
+          visualViewport.removeEventListener('scroll', handleVisualViewport)
+        }
+      })
     },
   },
   scene: [BootScene, PreloadScene, MenuScene, GameScene],

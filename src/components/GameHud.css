@@ -47,16 +47,6 @@
   gap: var(--space-4);
 }
 
-/* ==================== 左下层 (虚拟摇杆 + 队友) ==================== */
-.hud-layer--left {
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  max-width: min(280px, 35vw);
-}
-
 /* ==================== 右下层 (战斗簇) ==================== */
 .hud-layer--right {
   bottom: 0;
@@ -64,31 +54,13 @@
   z-index: var(--z-hud-controls);
 }
 
-/* ==================== 右上层 (战略物品) ==================== */
-.hud-layer--top-right {
-  top: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  z-index: var(--z-hud-controls);
-}
-
-/* ==================== 中央层 (弹药显示) ==================== */
-.hud-layer--center {
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) translateZ(0);
-  /* GPU加速 */
-  will-change: transform;
-}
-
 /* ==================== 玩家状态 ==================== */
 .hud-player-status {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  min-width: clamp(180px, 25vw, 260px);
+  min-width: clamp(120px, 20vw, 200px);
+  align-items: flex-start;
 }
 
 .hud-player-faction {
@@ -97,66 +69,8 @@
   opacity: 0.8;
 }
 
-/* ==================== 血量条 ==================== */
-.hud-health-bar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.hud-health-bar__label {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--font-size-sm);
-  letter-spacing: 0.08em;
-}
-
-.hud-health-bar__value {
-  color: var(--color-text-primary);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.65);
-}
-
-.hud-health-bar__track {
-  position: relative;
-  height: clamp(12px, 2vmin, 16px);
-  border: var(--border-width-base) solid var(--color-safe-border);
-  background: var(--color-background-alpha);
-  overflow: hidden;
-  border-radius: var(--border-radius-sm);
-  
-  /* 性能优化 */
-  contain: strict;
-}
-
-.hud-health-bar__fill {
-  height: 100%;
-  background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), rgba(57, 255, 170, 0.9));
-  box-shadow: var(--glow-safe);
-  
-  /* 使用transform而非width动画 */
-  transform: scaleX(var(--health-percent, 1)) translateZ(0);
-  transform-origin: left center;
-  transition: transform var(--transition-base) var(--easing-out);
-  
-  /* GPU加速 */
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-.hud-health-bar.warning .hud-health-bar__fill {
-  background: linear-gradient(90deg, rgba(255, 183, 0, 0.95), rgba(255, 230, 102, 0.9));
-  box-shadow: var(--glow-warning);
-}
-
-.hud-health-bar.danger .hud-health-bar__fill {
-  background: linear-gradient(90deg, rgba(255, 7, 58, 0.95), rgba(255, 102, 123, 0.9));
-  box-shadow: var(--glow-danger);
-  animation: pulse-danger 1s infinite alternate;
-}
-
-@keyframes pulse-danger {
-  from { filter: brightness(1); }
-  to { filter: brightness(1.3); }
+.hud-player-status .hud-teammates {
+  margin-top: var(--space-3);
 }
 
 /* ==================== 阶段信息 ==================== */
@@ -216,27 +130,6 @@
     opacity: 1;
     transform: translateY(0) translateZ(0);
   }
-}
-
-/* ==================== 虚拟摇杆 ==================== */
-.hud-joystick-ghost {
-  width: var(--joystick-size);
-  height: var(--joystick-size);
-  border: var(--border-width-base) dashed rgba(57, 255, 20, 0.25);
-  border-radius: 50%;
-  position: relative;
-  background: radial-gradient(rgba(57, 255, 20, 0.15), rgba(10, 15, 20, 0.05));
-  
-  /* 性能优化 */
-  contain: strict;
-  will-change: transform;
-}
-
-.hud-joystick-ghost__inner {
-  position: absolute;
-  inset: var(--space-4);
-  border-radius: 50%;
-  border: var(--border-width-base) solid rgba(57, 255, 20, 0.35);
 }
 
 /* ==================== 队友状态列表 ==================== */
@@ -440,196 +333,6 @@
   border-color: rgba(147, 197, 253, 0.85);
 }
 
-/* ==================== 战略物品簇 ==================== */
-.hud-strategic {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  pointer-events: auto;
-}
-
-.hud-strategic__swap {
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-background-alpha);
-  border: var(--border-width-base) solid var(--color-info-border);
-  color: var(--color-info);
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  border-radius: var(--border-radius-base);
-  
-  /* 触摸优化 */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  min-height: var(--touch-target-min);
-  
-  /* 动画 */
-  transition: 
-    transform var(--transition-fast) var(--easing-out),
-    box-shadow var(--transition-base) var(--easing-out);
-  
-  /* 性能优化 */
-  pointer-events: auto;
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-.hud-strategic__swap:active {
-  transform: scale(0.97) translateZ(0);
-  box-shadow: var(--glow-info);
-}
-
-.hud-strategic__label {
-  display: block;
-}
-
-.hud-strategic__value {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: var(--font-size-xs);
-  color: rgba(147, 197, 253, 0.85);
-}
-
-.hud-strategic__slots {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.hud-slot {
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width-base) solid rgba(57, 255, 20, 0.35);
-  background: var(--color-background-alpha);
-  letter-spacing: 0.08em;
-  border-radius: var(--border-radius-base);
-  
-  /* 动画 */
-  transition: 
-    box-shadow var(--transition-base) var(--easing-out),
-    border-color var(--transition-base) var(--easing-out);
-}
-
-.hud-slot-button {
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  pointer-events: auto;
-  min-height: var(--touch-target-min);
-  
-  /* 触摸优化 */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  
-  /* 动画 */
-  transition: transform var(--transition-fast) var(--easing-out);
-  
-  /* 性能优化 */
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-.hud-slot-button:active {
-  transform: scale(0.97) translateZ(0);
-}
-
-.hud-slot-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.hud-slot__label {
-  font-size: var(--font-size-xs);
-  opacity: 0.75;
-  display: block;
-}
-
-.hud-slot__value {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-}
-
-.hud-slot--active {
-  box-shadow: 0 0 16px var(--color-warning-glow);
-}
-
-.hud-slot--heal.hud-slot--active {
-  border-color: rgba(57, 255, 200, 0.85);
-  box-shadow: 0 0 18px rgba(57, 255, 200, 0.32);
-}
-
-.hud-slot--throwable.hud-slot--active {
-  border-color: var(--color-warning-border);
-  box-shadow: 0 0 18px var(--color-warning-glow);
-}
-
-.hud-slot--heal {
-  border-color: rgba(57, 255, 140, 0.55);
-}
-
-.hud-slot--throwable {
-  border-color: rgba(255, 183, 0, 0.55);
-}
-
-/* ==================== 弹药显示 ==================== */
-.hud-ammo {
-  min-width: clamp(180px, 25vw, 240px);
-  padding: var(--space-3) var(--space-4);
-  border: var(--border-width-base) solid rgba(57, 255, 20, 0.35);
-  background: var(--color-background-alpha);
-  text-align: center;
-  letter-spacing: 0.08em;
-  border-radius: var(--border-radius-base);
-  backdrop-filter: var(--backdrop-blur-sm);
-}
-
-.hud-ammo__name {
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--space-2);
-  color: var(--color-text-secondary);
-}
-
-.hud-ammo__count {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--space-2);
-  color: var(--color-text-primary);
-  text-shadow: 0 0 8px var(--color-safe-glow);
-}
-
-.hud-ammo__divider {
-  margin: 0 var(--space-1);
-  opacity: 0.7;
-}
-
-.hud-ammo__track {
-  position: relative;
-  height: clamp(4px, 1vmin, 6px);
-  background: rgba(12, 18, 28, 0.85);
-  border: var(--border-width-thin) solid rgba(57, 255, 20, 0.35);
-  border-radius: var(--border-radius-full);
-  overflow: hidden;
-  
-  /* 性能优化 */
-  contain: strict;
-}
-
-.hud-ammo__fill {
-  height: 100%;
-  background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), rgba(102, 255, 178, 0.9));
-  
-  /* 使用transform动画 */
-  transform: scaleX(var(--ammo-percent, 1)) translateZ(0);
-  transform-origin: left center;
-  transition: transform var(--transition-base) var(--easing-out);
-  
-  /* GPU加速 */
-  will-change: transform;
-}
-
 /* ==================== 情境交互 ==================== */
 .hud-context {
   position: absolute;
@@ -748,8 +451,6 @@
 @media (hover: none) and (pointer: coarse) {
   /* 增大所有可点击元素的触摸区域 */
   .hud-button::before,
-  .hud-slot-button::before,
-  .hud-strategic__swap::before,
   .hud-context__button::before {
     content: '';
     position: absolute;

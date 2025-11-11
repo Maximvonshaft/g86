@@ -21,22 +21,24 @@ export class BootScene extends Phaser.Scene {
 
   private configureScaling() {
     const scaleManager = this.scale
-    scaleManager.scaleMode = Phaser.Scale.RESIZE
-    scaleManager.autoCenter = Phaser.Scale.CENTER_BOTH
-    const updateMetrics = (gameSize: Phaser.Structs.Size) => {
-      gameStore.setViewport({
-        width: gameSize.width,
-        height: gameSize.height,
-      })
-      this.events.emit(EventChannel.ViewportChange, gameSize)
+    const emitViewportMetrics = () => {
+      this.events.emit(
+        EventChannel.ViewportChange,
+        gameStore.getState().viewport,
+      )
     }
-    updateMetrics(scaleManager.gameSize)
-    scaleManager.on(Phaser.Scale.Events.RESIZE, updateMetrics)
-    window.addEventListener('orientationchange', () => {
+    emitViewportMetrics()
+    scaleManager.on(Phaser.Scale.Events.RESIZE, emitViewportMetrics)
+    const handleOrientationChange = () => {
       setTimeout(() => {
         scaleManager.refresh()
-        updateMetrics(scaleManager.gameSize)
-      }, 300)
+        emitViewportMetrics()
+      }, 180)
+    }
+    window.addEventListener('orientationchange', handleOrientationChange)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      scaleManager.off(Phaser.Scale.Events.RESIZE, emitViewportMetrics)
+      window.removeEventListener('orientationchange', handleOrientationChange)
     })
   }
 }
